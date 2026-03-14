@@ -1,6 +1,10 @@
 #include <iostream>
 
+#include "PaymentProcessor.h"
+
 int main() {
-    std::cout << "Hello world!" << std::endl;
-    
+    PaymentRequest request{PaymentType::CreditCard, 100, ""};
+
+    PaymentProcessor processor;
+    processor.process(request);
 }
