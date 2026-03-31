@@ -4,8 +4,7 @@
 
 PaymentResult PaymentProcessor::process(const PaymentRequest& request)
 {
-    CreditCardStrategy strategy;
-    PaymentResult res = strategy.MakePayment(request);
+    PaymentResult res = _strategy->MakePayment(request);
 
     if (res == PaymentResult::OK) {
         std::cout << "OK" << std::endl;
