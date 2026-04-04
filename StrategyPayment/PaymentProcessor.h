@@ -1,8 +1,6 @@
 #pragma once
 
-#include "PaymentStrategy.h"
-
-using PaymentStrategyPtr = std::unique_ptr<PaymentStrategy>;
+#include "PaymentStrategyLogger.h"
 
 class PaymentProcessor
 {

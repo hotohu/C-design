@@ -3,6 +3,7 @@
 #include <map>
 
 #include "PaymentProcessor.h"
+#include "PaymentStrategyLogger.h"
 
 int main() {
     PaymentRequest request{PaymentType::CreditCard, 100000, "USD"};
@@ -13,6 +14,9 @@ int main() {
         }}
     };
 
-    PaymentProcessor processor(strategyCreator[request.type]());
+    PaymentStrategyPtr strategy(strategyCreator[request.type]());
+    PaymentStrategyPtr loggerWrapper = std::make_unique<PaymentStrategyLogger>(std::move(strategy));
+
+    PaymentProcessor processor(std::move(loggerWrapper));
     processor.process(request);
 }

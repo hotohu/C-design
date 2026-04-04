@@ -5,7 +5,9 @@ set(SOURCES main.cpp
 			PaymentProcessor.h
 			PaymentProcessor.cpp
 			PaymentStrategy.h
-			PaymentStrategy.cpp)
+			PaymentStrategy.cpp
+			PaymentStrategyLogger.h
+			PaymentStrategyLogger.cpp)
 			
 add_executable(StrategyPayment ${SOURCES})
 

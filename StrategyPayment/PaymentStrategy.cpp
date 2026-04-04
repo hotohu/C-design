@@ -2,18 +2,12 @@
 
 #include <iostream>
 
-PaymentResult PaymentStrategy::MakePayment(const PaymentRequest& request) 
-{
-    PaymentResult res = MakePaymentImpl(request);
-    return res;
-}
-
 CreditCardStrategy::CreditCardStrategy()
 : _service(new MockBankService())
 {
 }
 
-PaymentResult CreditCardStrategy::MakePaymentImpl(const PaymentRequest& request) 
+PaymentResult CreditCardStrategy::MakePayment(const PaymentRequest& request) 
 {
     if (_service->GetCurrency() != request.currency) {
         return PaymentResult::FAIL;

@@ -3,6 +3,9 @@
 #include <string>
 #include <memory>
 
+class PaymentStrategy;
+using PaymentStrategyPtr = std::unique_ptr<PaymentStrategy>;
+
 enum class PaymentType
 {
     CreditCard,
@@ -27,11 +30,8 @@ enum class PaymentResult
 class PaymentStrategy 
 {
 public:
-    PaymentResult MakePayment(const PaymentRequest& request);
+    virtual PaymentResult MakePayment(const PaymentRequest& request) = 0;
     virtual ~PaymentStrategy() {};
-
-private:
-    virtual PaymentResult MakePaymentImpl(const PaymentRequest& request) = 0;
 };
 
 class MockBankService;
@@ -40,10 +40,9 @@ class CreditCardStrategy : public PaymentStrategy
 {
 public:
     CreditCardStrategy();
-
+    PaymentResult MakePayment(const PaymentRequest& request) override;
+    
 private:
-    virtual PaymentResult MakePaymentImpl(const PaymentRequest& request);
-
     using BankServicePtr = std::unique_ptr<MockBankService>;
     BankServicePtr _service;
 };
