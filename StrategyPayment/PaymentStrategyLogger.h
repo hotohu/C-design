@@ -5,11 +5,10 @@
 class PaymentStrategyLogger : public PaymentStrategy
 {
 public:
-    PaymentStrategyLogger(PaymentStrategyPtr iStrategy) : _strategy(std::move(iStrategy))
-    {}
+    explicit PaymentStrategyLogger(PaymentStrategyPtr iStrategy);
 
-    PaymentResult MakePayment(const PaymentRequest& request) override;
-    virtual ~PaymentStrategyLogger() {};
+    void MakePayment(const PaymentRequest& request) override;
+    virtual ~PaymentStrategyLogger() = default;
 
 private:
     PaymentStrategyPtr _strategy;

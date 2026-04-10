@@ -2,34 +2,29 @@
 
 #include <iostream>
 
-CreditCardStrategy::CreditCardStrategy()
-: _service(new MockBankService())
+void CreditCardStrategy::MakePayment(const PaymentRequest& request) 
 {
-}
-
-PaymentResult CreditCardStrategy::MakePayment(const PaymentRequest& request) 
-{
-    if (_service->GetCurrency() != request.currency) {
-        return PaymentResult::FAIL;
+    if (_currency != request.currency) {
+        throw std::runtime_error("Currency of request isn't eligible for this payment");
     }
 
-    if (_service->GetLimit() < request.amount) {
-        return PaymentResult::FAIL;
+    if (request.amount > _limit) {
+        throw std::runtime_error("Limit of credit card less than amount");
     }
 
-    _service->ProcessTransaction(request.amount);
-
-    return PaymentResult::OK;
+    _limit -= request.amount;
 }
 
-void MockBankService::ProcessTransaction(double amount)
+void CryptoStrategy::MakePayment(const PaymentRequest& request) 
 {
-    if (_limit - amount > 0) {
-        std::cout << "Transaction was succesfully processed" << std::endl;
-        _limit -= amount;
-        return;
+    if (_currency != request.currency) {
+        throw std::runtime_error("Currency of request isn't eligible for this payment");
     }
 
-    std::cout << "Transaction was not processed" << std::endl;
-}
+    if (request.amount > _currentFee + _balance) {
+        throw std::runtime_error("Balance of wallet less than amount and fee");
+    }
 
+    double requiredPayment = _currentFee + _balance;
+    _balance -= requiredPayment;
+}

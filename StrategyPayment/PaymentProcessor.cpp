@@ -2,17 +2,10 @@
 #include <iostream>
 #include "PaymentProcessor.h"
 
-PaymentResult PaymentProcessor::process(const PaymentRequest& request)
+PaymentProcessor::PaymentProcessor(PaymentStrategyPtr iStrategy) : _strategy(std::move(iStrategy)) 
+{}
+
+void PaymentProcessor::process(const PaymentRequest& request) const
 {
-    PaymentResult res = _strategy->MakePayment(request);
-
-    if (res == PaymentResult::OK) {
-        std::cout << "OK" << std::endl;
-    }
-
-    if (res == PaymentResult::FAIL) {
-        std::cout << "FAIL" << std::endl;
-    }
-
-    return res;
+    _strategy->MakePayment(request);
 }

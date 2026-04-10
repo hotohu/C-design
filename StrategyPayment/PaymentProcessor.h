@@ -5,10 +5,10 @@
 class PaymentProcessor
 {
 public:
-    PaymentProcessor(PaymentStrategyPtr strategy) : _strategy(std::move(strategy)) {}
+    explicit PaymentProcessor(PaymentStrategyPtr iStrategy);
 
-    PaymentResult process(const PaymentRequest& request);
-    virtual ~PaymentProcessor() {};
+    void process(const PaymentRequest& request) const;
+    virtual ~PaymentProcessor() = default;
 
 private:
     PaymentStrategyPtr _strategy;
