@@ -9,8 +9,11 @@ using PaymentStrategyPtr = std::unique_ptr<PaymentStrategy>;
 enum class PaymentType
 {
     CreditCard,
-    Crypto
+    Crypto,
+    Alipay
 };
+
+const char* PaymentTypeToString(PaymentType type);
 
 struct PaymentRequest
 {

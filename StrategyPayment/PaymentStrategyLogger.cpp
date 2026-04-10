@@ -8,7 +8,7 @@ PaymentStrategyLogger::PaymentStrategyLogger(PaymentStrategyPtr iStrategy)
 
 void PaymentStrategyLogger::MakePayment(const PaymentRequest& request) 
 {
-    std::cout << "Try to make payment:" << std::endl;
+    std::cerr << "Starting the payment - " << PaymentTypeToString(request.type) << std::endl;
     _strategy->MakePayment(request);
-    std::cout << "Payment was made:" << std::endl;
+    std::cerr << "Payment completed - " << PaymentTypeToString(request.type) << std::endl;
 }
