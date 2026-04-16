@@ -15,6 +15,21 @@ enum class PaymentType
 
 const char* PaymentTypeToString(PaymentType type);
 
+class PaymentError : public std::runtime_error {
+public:
+    using std::runtime_error::runtime_error;
+};
+
+class CurrencyError : public PaymentError {
+public:
+    using PaymentError::PaymentError;
+};
+
+class BalanceExceededError : public PaymentError {
+public:
+    using PaymentError::PaymentError;
+};
+
 struct PaymentRequest
 {
     PaymentType type;
@@ -38,7 +53,6 @@ private:
     double _limit = 1000;
     std::string _currency = "USD";
 };
-
 
 class CryptoStrategy : public PaymentStrategy
 {
