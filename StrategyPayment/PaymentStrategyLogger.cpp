@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "PaymentStrategyLogger.h"
+#include "PaymentError.h"
 
 struct RequestLogger {
     RequestLogger(const PaymentRequest& iRequest) {
@@ -20,8 +21,13 @@ PaymentStrategyLogger::PaymentStrategyLogger(PaymentStrategyPtr iStrategy)
 {
 }
 
-void PaymentStrategyLogger::MakePayment(const PaymentRequest& iRequest, PaymentData& iData) const
+void PaymentStrategyLogger::MakePayment(const PaymentRequest& iRequest, PaymentContext& iData) const
 {
     RequestLogger logger(iRequest);
-    _strategy->MakePayment(iRequest, iData);
+    try {
+        _strategy->MakePayment(iRequest, iData);
+    } catch (const PaymentError& err) {
+        std::cerr << err.what() <<std::endl;
+        throw;
+    }
 }

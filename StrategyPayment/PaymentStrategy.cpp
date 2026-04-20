@@ -1,4 +1,5 @@
 #include "PaymentStrategy.h"
+#include "PaymentError.h"
 
 const char* PaymentTypeToString(PaymentType type) {
     switch (type) {
@@ -9,24 +10,40 @@ const char* PaymentTypeToString(PaymentType type) {
     }
 }
 
-void CreditCardStrategy::MakePayment(const PaymentRequest& request, PaymentData& iData) const
+void CreditCardStrategy::MakePayment(const PaymentRequest& request, PaymentContext& iData) const
 {
-    CreditCardPaymentData& data = dynamic_cast<CreditCardPaymentData&>(iData);
-    if (request.amount > data.limit) {
-        throw BalanceExceededError("Limit of the credit card less than amount");
-    }
+    try {
+        CreditCardPaymentData& data = dynamic_cast<CreditCardPaymentData&>(iData);
+        if (request.amount > data.limit) {
+            throw PaymentDeclinedError("Credit card data doesn't have enough limit to process payment");
+        }
 
-    data.limit -= request.amount;
+        data.limit -= request.amount;
+    } catch(std::bad_cast& err) {
+        throw PaymentDeclinedError("We don't have credit card data-type to process payment");
+    }
 }
 
 
-void CryptoStrategy::MakePayment(const PaymentRequest& request, PaymentData& iData) const
+void CryptoStrategy::MakePayment(const PaymentRequest& request, PaymentContext& iData) const
 {
-    CryptoPaymentData& data = dynamic_cast<CryptoPaymentData&>(iData);
-    if (request.amount > data.feeInPercent + data.balance) {
-        throw BalanceExceededError("Balance of the wallet less than amount and fee");
-    }
+    try {
+        CryptoPaymentData& data = dynamic_cast<CryptoPaymentData&>(iData);
+  
+        if (!data.walletValidated) {
+            throw PaymentDeclinedError("Crypto data isn't validated");
+        }
+        
+        double fee = (request.amount / 100) * data.feeInPercent;
+        const double requiredPayment = fee + request.amount;
 
-    double requiredPayment = data.feeInPercent + request.amount;
-    data.balance -= requiredPayment;
+        if (requiredPayment > data.balance) {
+            throw PaymentDeclinedError("Crypto data doesn't have enough amount to process payment");
+        }
+
+ 
+        data.balance -= requiredPayment;
+    } catch(std::bad_cast& err) {
+        throw PaymentDeclinedError("We don't have crypto data-type to process payment");
+    }
 }

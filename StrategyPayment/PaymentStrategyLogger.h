@@ -7,7 +7,7 @@ class PaymentStrategyLogger : public PaymentStrategy
 public:
     explicit PaymentStrategyLogger(PaymentStrategyPtr iStrategy);
 
-    void MakePayment(const PaymentRequest& request, PaymentData& iData) const override;
+    void MakePayment(const PaymentRequest& request, PaymentContext& iData) const override;
     virtual ~PaymentStrategyLogger() = default;
 
 private:

@@ -8,7 +8,7 @@ set(SOURCES main.cpp
 			PaymentStrategy.cpp
 			PaymentStrategyLogger.h
 			PaymentStrategyLogger.cpp
-			PaymentData.h)
+			PaymentContext.h)
 			
 add_executable(StrategyPayment ${SOURCES})
 

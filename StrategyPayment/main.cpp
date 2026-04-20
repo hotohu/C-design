@@ -1,30 +1,34 @@
 #include <iostream>
 
 #include "PaymentProcessor.h"
-#include "PaymentData.h"
+#include "PaymentError.h"
 
-void ProcessRequestByStrategy(PaymentProcessor& iProcessor, const PaymentRequest& iRequest, PaymentData& iData)
+void ProcessRequestByStrategy(PaymentProcessor& iProcessor, const PaymentRequest& iRequest, PaymentContext& iData)
 {
     try {
-        iProcessor.process(iRequest, iData);
-    } catch(const StrategyError& iError) {
-        std::cerr << iError.what() << std::endl;
-    } catch(const BalanceExceededError& iError) {
-        iProcessor.processDefault(iRequest, iData);
+        return iProcessor.process(iRequest, iData);
+    } catch (const PaymentDeclinedError& iError) {
+        return iProcessor.processDefault(iRequest, iData);
     }
 }
 
 int main() 
 {    
     PaymentProcessor processor;
-    processor.registerStrategy(PaymentType::CreditCard, std::make_unique<CreditCardStrategy>());
+    processor.registerDefaultStrategy(PaymentType::CreditCard, std::make_unique<CreditCardStrategy>());
     processor.registerStrategy(PaymentType::Crypto, std::make_unique<CryptoStrategy>());
+
+    try {
+        processor.unregisterStrategy(PaymentType::Alipay);
+    } catch(PaymentResolvingError& err) {
+        std::cerr << err.what() << std::endl;
+    }
 
     PaymentRequest requestAlipay{PaymentType::Alipay};
     PaymentRequest requestCreditCard{PaymentType::CreditCard, 100000, "USD"};
     PaymentRequest requestCrypto{PaymentType::Crypto, 0.014, "BTC"};
 
-    PaymentData data;
+    PaymentContext data;
 
     CreditCardPaymentData ccData;
     ccData.limit = 200;
@@ -33,7 +37,17 @@ int main()
     crData.balance = 0.001;
     crData.feeInPercent = 5;
 
-    ProcessRequestByStrategy(processor, requestAlipay, data);
-    ProcessRequestByStrategy(processor, requestCreditCard, ccData);
-    ProcessRequestByStrategy(processor, requestCrypto, crData);
+    try {
+        ProcessRequestByStrategy(processor, requestAlipay, data);
+    } catch (const std::runtime_error& err) {
+        std::cerr << err.what() << std::endl;
+    }
+
+    try {
+        ProcessRequestByStrategy(processor, requestCreditCard, ccData);
+    } catch (const std::runtime_error& err) {
+        std::cerr << err.what() << std::endl;
+    }
+    
+    //ProcessRequestByStrategy(processor, requestCrypto, crData);
 }

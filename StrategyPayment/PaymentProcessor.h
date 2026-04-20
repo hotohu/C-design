@@ -5,24 +5,18 @@
 #include <optional>
 
 #include "PaymentStrategyLogger.h"
-#include "PaymentData.h"
-
-class StrategyError : public std::runtime_error {
-public:
-    using std::runtime_error::runtime_error;
-};
 
 class PaymentProcessor final
 {
 public:
-    void process(const PaymentRequest& iRequest, PaymentData& iData);
-    void processDefault(const PaymentRequest& iRequest, PaymentData& iData);
+    void process(const PaymentRequest& iRequest, PaymentContext& oData);
+    void processDefault(const PaymentRequest& iRequest, PaymentContext& oData);
 
     virtual ~PaymentProcessor() = default;
 
 
-    void registerStrategy(PaymentType iType, PaymentStrategyPtr&& iStrategy);
-    void registerDefaultStrategy(PaymentType iType, PaymentStrategyPtr&& iStrategy);
+    void registerStrategy(PaymentType iType, PaymentStrategyPtr&& iStrategy) noexcept;
+    void registerDefaultStrategy(PaymentType iType, PaymentStrategyPtr&& iStrategy) noexcept;
     
     void unregisterStrategy(PaymentType iType);
 
