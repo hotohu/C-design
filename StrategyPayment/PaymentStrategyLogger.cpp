@@ -20,8 +20,8 @@ PaymentStrategyLogger::PaymentStrategyLogger(PaymentStrategyPtr iStrategy)
 {
 }
 
-void PaymentStrategyLogger::MakePayment(const PaymentRequest& iRequest) 
+void PaymentStrategyLogger::MakePayment(const PaymentRequest& iRequest, PaymentData& iData) const
 {
     RequestLogger logger(iRequest);
-    _strategy->MakePayment(iRequest);
+    _strategy->MakePayment(iRequest, iData);
 }

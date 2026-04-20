@@ -3,6 +3,8 @@
 #include <string>
 #include <memory>
 
+#include "PaymentData.h"
+
 class PaymentStrategy;
 using PaymentStrategyPtr = std::unique_ptr<PaymentStrategy>;
 
@@ -40,28 +42,19 @@ struct PaymentRequest
 class PaymentStrategy 
 {
 public:
-    virtual void MakePayment(const PaymentRequest& request) = 0;
+    virtual void MakePayment(const PaymentRequest& request, PaymentData& iData) const = 0;
     virtual ~PaymentStrategy() = default;
 };
 
 class CreditCardStrategy final : public PaymentStrategy
 {
 public:
-    void MakePayment(const PaymentRequest& request) override;
-    
-private:
-    double _limit = 1000;
-    std::string _currency = "USD";
+    void MakePayment(const PaymentRequest& request, PaymentData& iData) const override;
 };
 
 class CryptoStrategy : public PaymentStrategy
 {
 public:
-    void MakePayment(const PaymentRequest& request) override;
-
-private:
-    double _balance = 0.8;
-    double _currentFee = 0.00001;
-    std::string _currency = "BTC";
+    void MakePayment(const PaymentRequest& request, PaymentData& iData) const override;
 };
 

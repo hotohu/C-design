@@ -1,16 +1,16 @@
 #include <iostream>
 
 #include "PaymentProcessor.h"
-#include "PaymentStrategyLogger.h"
+#include "PaymentData.h"
 
-void ProcessRequestByStrategy(PaymentProcessor& iProcessor, const PaymentRequest& iRequest)
+void ProcessRequestByStrategy(PaymentProcessor& iProcessor, const PaymentRequest& iRequest, PaymentData& iData)
 {
     try {
-        iProcessor.process(iRequest);
+        iProcessor.process(iRequest, iData);
     } catch(const StrategyError& iError) {
         std::cerr << iError.what() << std::endl;
     } catch(const BalanceExceededError& iError) {
-        iProcessor.processDefault(iRequest);
+        iProcessor.processDefault(iRequest, iData);
     }
 }
 
@@ -24,7 +24,16 @@ int main()
     PaymentRequest requestCreditCard{PaymentType::CreditCard, 100000, "USD"};
     PaymentRequest requestCrypto{PaymentType::Crypto, 0.014, "BTC"};
 
-    ProcessRequestByStrategy(processor, requestAlipay);
-    ProcessRequestByStrategy(processor, requestCreditCard);
-    ProcessRequestByStrategy(processor, requestCrypto);
+    PaymentData data;
+
+    CreditCardPaymentData ccData;
+    ccData.limit = 200;
+
+    CryptoPaymentData crData;
+    crData.balance = 0.001;
+    crData.feeInPercent = 5;
+
+    ProcessRequestByStrategy(processor, requestAlipay, data);
+    ProcessRequestByStrategy(processor, requestCreditCard, ccData);
+    ProcessRequestByStrategy(processor, requestCrypto, crData);
 }

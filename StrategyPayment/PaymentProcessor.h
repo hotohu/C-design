@@ -5,6 +5,7 @@
 #include <optional>
 
 #include "PaymentStrategyLogger.h"
+#include "PaymentData.h"
 
 class StrategyError : public std::runtime_error {
 public:
@@ -14,8 +15,8 @@ public:
 class PaymentProcessor final
 {
 public:
-    void process(const PaymentRequest& iRequest);
-    void processDefault(const PaymentRequest& iRequest);
+    void process(const PaymentRequest& iRequest, PaymentData& iData);
+    void processDefault(const PaymentRequest& iRequest, PaymentData& iData);
 
     virtual ~PaymentProcessor() = default;
 

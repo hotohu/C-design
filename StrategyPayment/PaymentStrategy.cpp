@@ -9,30 +9,24 @@ const char* PaymentTypeToString(PaymentType type) {
     }
 }
 
-void CreditCardStrategy::MakePayment(const PaymentRequest& request) 
+void CreditCardStrategy::MakePayment(const PaymentRequest& request, PaymentData& iData) const
 {
-    if (_currency != request.currency) {
-        throw CurrencyError("Currency of the request isn't eligible for this payment");
-    }
-
-    if (request.amount > _limit) {
+    CreditCardPaymentData& data = dynamic_cast<CreditCardPaymentData&>(iData);
+    if (request.amount > data.limit) {
         throw BalanceExceededError("Limit of the credit card less than amount");
     }
 
-    _limit -= request.amount;
+    data.limit -= request.amount;
 }
 
 
-void CryptoStrategy::MakePayment(const PaymentRequest& request) 
+void CryptoStrategy::MakePayment(const PaymentRequest& request, PaymentData& iData) const
 {
-    if (_currency != request.currency) {
-        throw CurrencyError("Currency of the request isn't eligible for this payment");
-    }
-
-    if (request.amount > _currentFee + _balance) {
+    CryptoPaymentData& data = dynamic_cast<CryptoPaymentData&>(iData);
+    if (request.amount > data.feeInPercent + data.balance) {
         throw BalanceExceededError("Balance of the wallet less than amount and fee");
     }
 
-    double requiredPayment = _currentFee + _balance;
-    _balance -= requiredPayment;
+    double requiredPayment = data.feeInPercent + request.amount;
+    data.balance -= requiredPayment;
 }
