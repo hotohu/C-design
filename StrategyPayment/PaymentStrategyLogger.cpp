@@ -28,6 +28,8 @@ void PaymentStrategyLogger::MakePayment(const PaymentRequest& iRequest, PaymentC
         _strategy->MakePayment(iRequest, iData);
     } catch (const PaymentError& err) {
         std::cerr << err.what() <<std::endl;
-        throw;
+
+        // We got the message in logger and we don't need to write it twice
+        throw PaymentDeclinedError("");
     }
 }

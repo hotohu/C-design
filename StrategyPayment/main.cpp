@@ -3,30 +3,17 @@
 #include "PaymentProcessor.h"
 #include "PaymentError.h"
 
-void ProcessRequestByStrategy(PaymentProcessor& iProcessor, const PaymentRequest& iRequest, PaymentContext& iData)
-{
-    try {
-        return iProcessor.process(iRequest, iData);
-    } catch (const PaymentDeclinedError& iError) {
-        return iProcessor.processDefault(iRequest, iData);
-    }
-}
-
 int main() 
 {    
     PaymentProcessor processor;
-    processor.registerDefaultStrategy(PaymentType::CreditCard, std::make_unique<CreditCardStrategy>());
+    processor.registerStrategy(PaymentType::CreditCard, std::make_unique<CreditCardStrategy>());
     processor.registerStrategy(PaymentType::Crypto, std::make_unique<CryptoStrategy>());
 
     try {
         processor.unregisterStrategy(PaymentType::Alipay);
-    } catch(PaymentResolvingError& err) {
+    } catch(PaymentError& err) {
         std::cerr << err.what() << std::endl;
     }
-
-    PaymentRequest requestAlipay{PaymentType::Alipay};
-    PaymentRequest requestCreditCard{PaymentType::CreditCard, 100000, "USD"};
-    PaymentRequest requestCrypto{PaymentType::Crypto, 0.014, "BTC"};
 
     PaymentContext data;
 
@@ -37,17 +24,39 @@ int main()
     crData.balance = 0.001;
     crData.feeInPercent = 5;
 
+    std::vector<std::pair<PaymentRequest, PaymentContext&>> attempts = {
+        { PaymentRequest{ PaymentType::Alipay, 100, "CNY" }, data},
+        { PaymentRequest{ PaymentType::CreditCard, 100 * 0.15, "USD" }, ccData},
+    };
+
+    for (auto& attempt : attempts) {
+        try {
+            processor.process(attempt.first, attempt.second);
+            break;
+        } catch(PaymentError& err) {
+            std::cerr << err.what() << std::endl;
+        }
+    }
+
+    /*PaymentRequest requestCreditCard{PaymentType::CreditCard, 100000, "USD"};
     try {
-        ProcessRequestByStrategy(processor, requestAlipay, data);
-    } catch (const std::runtime_error& err) {
+        processor.process(requestCreditCard, ccData);
+    } catch (const PaymentError& err) {
         std::cerr << err.what() << std::endl;
     }
 
+    PaymentRequest requestCrypto{PaymentType::Crypto, 0.014, "BTC"};
     try {
-        ProcessRequestByStrategy(processor, requestCreditCard, ccData);
-    } catch (const std::runtime_error& err) {
-        std::cerr << err.what() << std::endl;
+        processor.process(requestCrypto, crData);
     }
-    
-    //ProcessRequestByStrategy(processor, requestCrypto, crData);
+    catch (const PaymentDeclinedError& err) {
+
+        // try to make default payment
+        PaymentRequest requestCreditCard{PaymentType::CreditCard, requestCrypto.amount*77463, "USD"};
+        processor.process(requestCreditCard, ccData);
+    }
+    catch (const PaymentError& err) {
+        std::cerr << err.what() << std::endl;
+    }*/
+
 }
