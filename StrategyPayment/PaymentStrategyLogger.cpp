@@ -27,9 +27,12 @@ void PaymentStrategyLogger::MakePayment(const PaymentRequest& iRequest, PaymentC
     try {
         _strategy->MakePayment(iRequest, iData);
     } catch (const PaymentError& err) {
-        std::cerr << err.what() <<std::endl;
-
-        // We got the message in logger and we don't need to write it twice
-        throw PaymentDeclinedError("");
+        std::cerr << err.what() << std::endl;
+        throw PaymentError("Payment wasn't process right");
+    } catch (const std::runtime_error& err) {
+        std::cerr << err.what() << std::endl;
+        throw;
     }
+
+    std::cerr << "Payment secceed" << std::endl;
 }
