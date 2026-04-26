@@ -2,30 +2,19 @@
 
 #include "PaymentStrategyLogger.h"
 #include "PaymentError.h"
-
-struct RequestLogger {
-    RequestLogger(const PaymentRequest& iRequest) {
-        _request = iRequest;
-        std::cerr << "Starting the payment - " << PaymentTypeToString(_request.type) << std::endl;  
-    }
-
-    ~RequestLogger() {
-        std::cerr << "Payment completed - " << PaymentTypeToString(_request.type) << std::endl;
-    }
-
-    PaymentRequest _request;
-};
+#include "PaymentLogger.h"
 
 PaymentStrategyLogger::PaymentStrategyLogger(PaymentStrategyPtr iStrategy) 
 : _strategy(std::move(iStrategy))
 {
 }
 
-void PaymentStrategyLogger::MakePayment(const PaymentRequest& iRequest, PaymentContext& iData) const
+void PaymentStrategyLogger::Process(const PaymentRequest& iRequest, PaymentContext& iData) const
 {
-    RequestLogger logger(iRequest);
+    PaymentLogger logger("Starting the payment - " + std::string(PaymentTypeToString(iRequest.type)), 
+                        "Payment completed - " + std::string(PaymentTypeToString(iRequest.type)));
     try {
-        _strategy->MakePayment(iRequest, iData);
+        _strategy->Process(iRequest, iData);
     } catch (const PaymentError& err) {
         std::cerr << err.what() << std::endl;
         throw PaymentError("Payment wasn't process right");

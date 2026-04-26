@@ -7,7 +7,7 @@ void PaymentProcessor::process(const PaymentRequest& iRequest, PaymentContext& i
         throw PaymentResolvingError("We can't process request: this strategy wasn't supported - " + std::string(PaymentTypeToString(iRequest.type)));
     }
 
-    _strategies[iRequest.type]->MakePayment(iRequest, iData);
+    _strategies[iRequest.type]->Process(iRequest, iData);
 }
 
 void PaymentProcessor::registerStrategy(PaymentType iType, PaymentStrategyPtr&& iStrategy) noexcept

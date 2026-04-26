@@ -2,19 +2,19 @@
 
 #include "PaymentProcessor.h"
 #include "PaymentError.h"
-
+#include "PaymentLogger.h"
 
 void PaymentMakeAttemptsAPI(PaymentProcessor& iProcessor, 
     std::vector<std::pair<PaymentRequest, PaymentContext&>>& iAttempts) {
     for (auto& attempt : iAttempts) {
-        std::cerr << "Starting attempt" << std::endl;
+        
+        PaymentLogger logger("Starting attempt", "Finished attempt");
         try {
             iProcessor.process(attempt.first, attempt.second);
             break;
         } catch(PaymentError& err) {
-            std::cerr << "Attempt failed: " << err.what() << std::endl;
+            std::cerr << "Try next attempt ! " << std::endl;
         }
-        std::cerr << "Finished attempt" << std::endl;
     }
 }
 

@@ -27,19 +27,19 @@ struct PaymentRequest
 class PaymentStrategy 
 {
 public:
-    virtual void MakePayment(const PaymentRequest& request, PaymentContext& iData) const = 0;
+    virtual void Process(const PaymentRequest& request, PaymentContext& iData) const = 0;
     virtual ~PaymentStrategy() = default;
 };
 
 class CreditCardStrategy final : public PaymentStrategy
 {
 public:
-    void MakePayment(const PaymentRequest& request, PaymentContext& iData) const override;
+    void Process(const PaymentRequest& request, PaymentContext& iData) const override;
 };
 
 class CryptoStrategy final : public PaymentStrategy
 {
 public:
-    void MakePayment(const PaymentRequest& request, PaymentContext& iData) const override;
+    void Process(const PaymentRequest& request, PaymentContext& iData) const override;
 };
 

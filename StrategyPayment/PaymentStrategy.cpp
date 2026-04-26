@@ -10,7 +10,7 @@ const char* PaymentTypeToString(PaymentType type) {
     }
 }
 
-void CreditCardStrategy::MakePayment(const PaymentRequest& request, PaymentContext& iData) const
+void CreditCardStrategy::Process(const PaymentRequest& request, PaymentContext& iData) const
 {
     try {
         CreditCardPaymentData& data = dynamic_cast<CreditCardPaymentData&>(iData);
@@ -25,7 +25,7 @@ void CreditCardStrategy::MakePayment(const PaymentRequest& request, PaymentConte
 }
 
 
-void CryptoStrategy::MakePayment(const PaymentRequest& request, PaymentContext& iData) const
+void CryptoStrategy::Process(const PaymentRequest& request, PaymentContext& iData) const
 {
     try {
         CryptoPaymentData& data = dynamic_cast<CryptoPaymentData&>(iData);
